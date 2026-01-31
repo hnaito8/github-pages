@@ -1,7 +1,10 @@
-"use client";
-
-import Default from "./_components/default";
+import NoteList from "./_components/note-list";
 
 export default function Page() {
-  return <Default />;
+  return (
+    <main>
+      <h1>Tech Notes</h1>
+      <NoteList />
+    </main>
+  );
 }
