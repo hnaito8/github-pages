@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: ./package-lock.json
+          cache-dependency-path: .frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Build with Next.js
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: ./frontend/out
 
   # Deployment job
   deploy:
