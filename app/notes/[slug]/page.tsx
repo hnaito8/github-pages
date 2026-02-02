@@ -1,17 +1,25 @@
-import { getNoteBySlug } from "@/app/_lib/notes";
+import { getNoteBySlug, getAllNotes } from "@/app/_lib/notes";
 
-export default function NotePage({ params }: { params: { slug: string } }) {
-  const note = getNoteBySlug(params.slug);
+export async function generateStaticParams() {
+  const notes = getAllNotes();
+  return notes.map((note) => ({
+    slug: note.slug,
+  }));
+}
 
-  if (!note) {
-    return <div>Not found</div>;
-  }
+export default async function NotePage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const note = await getNoteBySlug(params.slug);
 
   return (
-    <article>
+    <article className="prose prose-neutral dark:prose-invert">
       <h1>{note.title}</h1>
-      <p>{note.date}</p>
-      <p>{note.summary}</p>
+      <p className="text-sm text-gray-500">{note.date}</p>
+
+      <div dangerouslySetInnerHTML={{ __html: note.content }} />
     </article>
   );
 }

@@ -1,0 +1,17 @@
+import { getNoteBySlug } from "@/app/_lib/notes";
+
+export default async function NotesPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const note = await getNoteBySlug(params.slug);
+
+  return;
+  <article className="prose prose-neutral dark:prose-invert">
+    <h1>{note.title}</h1>
+    <p className="text-sm text-gray-500">{note.date}</p>
+
+    <div dangerouslySetInnerHTML={{ __html: note.content }} />
+  </article>;
+}

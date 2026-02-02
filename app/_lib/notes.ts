@@ -1,31 +1,41 @@
-export type Note = {
-  slug: string;
-  title: string;
-  date: string;
-  summary: string;
-};
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { remark } from "remark";
+import html from "remark-html";
+import { type Note } from "./types";
 
-export const notes: Note[] = [
-  {
-    slug: "first-note",
-    title: "はじめての Tech Note",
-    date: "2026-01-01",
-    summary: "Next.js と GitHub Pages で開発ログを始めた話",
-  },
-  {
-    slug: "github-pages-next.js",
-    title: "GitHub Pages × Next.js でハマったこと",
-    date: "2026-01-02",
-    summary: "basePath や static export 周りの落とし穴",
-  },
-];
+const notesDir = path.join(process.cwd(), "content", "notes");
 
-export function getAllNotes(): Note[] {
-  return notes.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+export function getAllNotes() {
+  const files = fs.readdirSync(notesDir);
+
+  return files.map((file) => {
+    const filePath = path.join(notesDir, file);
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const { data } = matter(fileContents);
+
+    return {
+      slug: file.replace(/¥.md$/, ""),
+      title: data.title,
+      date: data.date,
+      summary: data.summary,
+    };
+  });
 }
 
-export function getNoteBySlug(slug: string): Note | undefined {
-  return notes.find((note) => note.slug === slug);
+export async function getNoteBySlug(slug: string) {
+  const filePath = path.join(notesDir, `${slug}.md`);
+  const fileContents = fs.readFileSync(filePath, "utf8");
+
+  const { data, content } = matter(fileContents);
+  const processed = await remark().use(html).process(content);
+
+  return {
+    slug,
+    title: data.title,
+    date: data.date,
+    summary: data.summary,
+    content: processed.toString(),
+  };
 }
